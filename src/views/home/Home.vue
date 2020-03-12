@@ -8,6 +8,7 @@
 
 <script>
 import NavBar from 'components/common/navbar/NavBar'
+//加一个注释
 import {getHomeMultiddata} from 'network/home'
 
 export default {
