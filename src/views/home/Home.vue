@@ -1,14 +1,17 @@
 <template>
   <div id="home">
     <nav-bar class="home-nav"><div slot="center">购物街</div></nav-bar>
-    <home-swiper :banners="banners" />
-    <home-recommend-view :recommends="recommends" />
-    <home-feature-view />
-    <tab-control class="tabControl" 
-    :titles="['流行', '新款', '精选']" 
-    @tabClick="tabClick"
-    />
-    <good-list :goods="showGoods" />
+    <scroll class="content" ref="scroll">
+      <home-swiper :banners="banners" />
+      <home-recommend-view :recommends="recommends" />
+      <home-feature-view />
+      <tab-control class="tabControl" 
+      :titles="['流行', '新款', '精选']" 
+      @tabClick="tabClick"
+      />
+      <good-list :goods="showGoods" />
+    </scroll>
+    <back-top @click.native="backClick" />
   </div>
 </template>
 
@@ -18,8 +21,10 @@ import homeRecommendView from './childComps/homeRecommendView'
 import homeFeatureView from './childComps/homeFeatureView'
 
 import NavBar from 'components/common/navbar/NavBar'
+import Scroll from 'components/common/scroll/Scroll'
 import tabControl from 'components/content/tabControl/tabControl'
 import GoodList from 'components/content/goods/GoodList'
+import BackTop from 'components/content/backTop/BackTop'
 
 import {getHomeMultiddata, getHomeGoods} from 'network/home'
 
@@ -42,8 +47,10 @@ export default {
     homeRecommendView,
     homeFeatureView,
     NavBar,
+    Scroll,
     tabControl,
-    GoodList
+    GoodList,
+    BackTop
   },
   created() {
     // 获取banner和recommend数据
@@ -75,6 +82,9 @@ export default {
           break
       }
     },
+    backClick() {
+      this.$refs.scroll.scrollTo(0, 0, 2000)
+    },
     /**
      * 网络请求相关的方法
      */
@@ -97,7 +107,9 @@ export default {
 
 <style scoped>
   #home {
-    padding: 44px 0 50px;
+    /* padding-top: 44px; */
+    height: 100vh;
+    position: relative;
   }
   .home-nav {
     background-color: var(--color-tint);
@@ -111,5 +123,14 @@ export default {
   .tabControl {
     position: sticky;
     top: 44px;
+  }
+  .content {
+    overflow: hidden;
+
+    position: absolute;
+    top: 44px;
+    bottom: 49px;
+    left: 0;
+    right: 0;
   }
 </style>
