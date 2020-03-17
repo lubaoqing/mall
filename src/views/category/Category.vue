@@ -133,6 +133,6 @@ export default {
 <style scoped>
   .wrapper {
     height: 150px;
-    background: red;
+    background: green;
   }
 </style>
