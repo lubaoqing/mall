@@ -1,42 +1,90 @@
 <template>
   <div id="detail">
     <detail-nav-bar />
-    <detail-swiper :topImages="topImages" />
+    <scroll ref="scroll" class="content">
+      <detail-swiper :topImages="topImages" />
+      <detail-base-info :goods="goodsInfo" />
+      <detail-shop-info :shop="shop" />
+      <detail-goods-info @detailGoodsImgLoad="detailGoodsImgLoad" :detail-info="detailInfo" />
+      <detail-comment-info :comment-info="commentInfo" />
+    </scroll>
   </div>
 </template>
 
 <script>
 import DetailNavBar from './childComps/DetailNavBar'
+import Scroll from 'components/common/scroll/Scroll'
 import DetailSwiper from './childComps/DetailSwiper'
+import DetailBaseInfo from './childComps/DetailBaseInfo'
+import DetailShopInfo from './childComps/DetailShopInfo'
+import DetailGoodsInfo from './childComps/DetailGoodsInfo'
+import DetailParamInfo from './childComps/DetailParamInfo'
+import DetailCommentInfo from './childComps/DetailCommentInfo'
 
 
-import {getDetail} from 'network/detail'
+import {getDetail, GoodsDetail, Shop, GoodsParam} from 'network/detail'
 
 export default {
   name: 'Detail',
   data() {
     return {
       iid: null,
-      topImages: []
+      topImages: [],
+      goodsInfo: {},
+      shop: {},
+      detailInfo: {},
+      paramInfo: {},
+      commentInfo: {}
     }
   },
   components: {
     DetailNavBar,
-    DetailSwiper
+    Scroll,
+    DetailSwiper,
+    DetailBaseInfo,
+    DetailShopInfo,
+    DetailGoodsInfo,
+    DetailParamInfo,
+    DetailCommentInfo
   },
   created() {
     this.iid = this.$route.params.iid
     getDetail(this.iid).then(res => {
-      console.log(res)
+      // 1.获取数据
+      const data = res.result
+      // 2.轮播图信息
       this.topImages = res.result.itemInfo.topImages
+      // 3.详情信息
+      this.goodsInfo = new GoodsDetail(data.itemInfo, data.columns, data.shopInfo.services)
+      // 4.店铺信息
+      this.shop = new Shop(data.shopInfo)
+      // 5.商品信息
+      this.detailInfo = data.detailInfo
+      // 6.参数信息
+      this.paramInfo = new GoodsParam(data.itemParams.info, data.itemParams.rule)
+      // 7.评论信息
+      if (data.rate.cRate !== 0) {
+        this.commentInfo = data.rate.list[0]
+      }
     })
   },
-  deactivated() {
-    this.iid = null
+  methods: {
+    detailGoodsImgLoad() {
+      this.$refs.scroll.refresh()
+    }
   },
 }
 </script>
 
-<style>
-
+<style scoped>
+  #detail {
+    height: 100vh;
+    position: relative;
+    z-index: 9;
+    background: #fff;
+  }
+  .content {
+    height: calc(100% - 44px);
+    overflow: hidden;
+  }
 </style>
