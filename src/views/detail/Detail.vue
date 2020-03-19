@@ -7,6 +7,7 @@
       <detail-shop-info :shop="shop" />
       <detail-goods-info @detailGoodsImgLoad="detailGoodsImgLoad" :detail-info="detailInfo" />
       <detail-comment-info :comment-info="commentInfo" />
+      <good-list :goods="recommends" />
     </scroll>
   </div>
 </template>
@@ -20,9 +21,11 @@ import DetailShopInfo from './childComps/DetailShopInfo'
 import DetailGoodsInfo from './childComps/DetailGoodsInfo'
 import DetailParamInfo from './childComps/DetailParamInfo'
 import DetailCommentInfo from './childComps/DetailCommentInfo'
+import GoodList from 'components/content/goods/GoodList'
 
 
-import {getDetail, GoodsDetail, Shop, GoodsParam} from 'network/detail'
+import {getDetail, GoodsDetail, Shop, GoodsParam, getRecommend} from 'network/detail'
+import {debounce} from 'common/utils'
 
 export default {
   name: 'Detail',
@@ -34,7 +37,8 @@ export default {
       shop: {},
       detailInfo: {},
       paramInfo: {},
-      commentInfo: {}
+      commentInfo: {},
+      recommends: []
     }
   },
   components: {
@@ -45,10 +49,13 @@ export default {
     DetailShopInfo,
     DetailGoodsInfo,
     DetailParamInfo,
-    DetailCommentInfo
+    DetailCommentInfo,
+    GoodList
   },
   created() {
+    // 1.获取iid
     this.iid = this.$route.params.iid
+    // 2.请求详情数据
     getDetail(this.iid).then(res => {
       // 1.获取数据
       const data = res.result
@@ -67,11 +74,21 @@ export default {
         this.commentInfo = data.rate.list[0]
       }
     })
+    // 3.请求推荐数据
+    getRecommend().then(res => {
+      this.recommends = res.data.list
+    })
   },
   methods: {
     detailGoodsImgLoad() {
       this.$refs.scroll.refresh()
     }
+  },
+  mounted() {
+    const refresh = debounce(this.$refs.scroll.refresh, 20)
+    this.$bus.$on('detailItemImgLoad', () => {
+      refresh()
+    })
   },
 }
 </script>

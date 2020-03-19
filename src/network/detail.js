@@ -1,5 +1,5 @@
 import {request} from './request'
-
+//请求详情数据
 export function getDetail(iid) {
   return request({
     url: '/detail',
@@ -42,4 +42,10 @@ export class GoodsParam {
     this.infos = info.set;
     this.sizes = rule.tables;
   }
+}
+//请求推荐数据
+export function getRecommend() {
+  return request({
+    url: '/recommend'
+  })
 }

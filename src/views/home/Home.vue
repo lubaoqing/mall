@@ -70,7 +70,7 @@ export default {
   mounted() {
     //监听图片加载完成
     const refresh = debounce(this.$refs.scroll.refresh, 20)
-    this.$bus.$on('itemImgLoad', () => {
+    this.$bus.$on('homeItemImgLoad', () => {
       refresh()
     })
   },
