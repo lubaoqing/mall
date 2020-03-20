@@ -19,7 +19,7 @@
     name: "DetailGoodsInfo",
     data() {
       return {
-        currentNumber: 0,
+        currentNumber: 1,
         imgLength: 0
       }
     },

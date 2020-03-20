@@ -3,7 +3,7 @@
     <img :src="showImg" @load="imgLoad" />
     <p>{{goodsItem.title}}</p>
     <div>
-      <span class="price">{{goodsItem.orgPrice}}</span>
+      <span class="price">{{price}}</span>
       <span class="cfav">{{goodsItem.cfav}}</span>
     </div>
   </div>
@@ -22,9 +22,9 @@ export default {
   },
   methods: {
     imgLoad() {
-      if (this.$rote.path.indexOf('/home')) {
+      if (this.$route.path.indexOf('/home') !== -1) {
         this.$bus.$emit('homeItemImgLoad')
-      }else if(this.$rote.path.indexOf('/detail')) {
+      }else if(this.$route.path.indexOf('/detail') !== -1) {
         this.$bus.$emit('detailItemImgLoad')
       }
       
@@ -36,6 +36,9 @@ export default {
   computed: {
     showImg() {
       return this.goodsItem.image || this.goodsItem.show.img
+    },
+    price() {
+      return '￥' + this.goodsItem.price || this.goodsItem.orgPrice
     }
   },
 }

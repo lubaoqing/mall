@@ -1,14 +1,16 @@
 <template>
   <div id="detail">
-    <detail-nav-bar />
-    <scroll ref="scroll" class="content">
+    <detail-nav-bar @topClick="tabNavClick" ref="nav"/>
+    <scroll ref="scroll" class="content"
+    :probe-type="3" @scroll="scroll">
       <detail-swiper :topImages="topImages" />
       <detail-base-info :goods="goodsInfo" />
       <detail-shop-info :shop="shop" />
-      <detail-goods-info @detailGoodsImgLoad="detailGoodsImgLoad" :detail-info="detailInfo" />
-      <detail-comment-info :comment-info="commentInfo" />
-      <good-list :goods="recommends" />
+      <detail-goods-info ref="params" @detailGoodsImgLoad="detailGoodsImgLoad" :detail-info="detailInfo" />
+      <detail-comment-info ref="comment" :comment-info="commentInfo" />
+      <good-list ref="recommend" :goods="recommends" />
     </scroll>
+    <detail-bottom-bar />
   </div>
 </template>
 
@@ -22,6 +24,7 @@ import DetailGoodsInfo from './childComps/DetailGoodsInfo'
 import DetailParamInfo from './childComps/DetailParamInfo'
 import DetailCommentInfo from './childComps/DetailCommentInfo'
 import GoodList from 'components/content/goods/GoodList'
+import DetailBottomBar from './childComps/DetailBottomBar'
 
 
 import {getDetail, GoodsDetail, Shop, GoodsParam, getRecommend} from 'network/detail'
@@ -38,7 +41,8 @@ export default {
       detailInfo: {},
       paramInfo: {},
       commentInfo: {},
-      recommends: []
+      recommends: [],
+      themeTopYs: []
     }
   },
   components: {
@@ -50,7 +54,8 @@ export default {
     DetailGoodsInfo,
     DetailParamInfo,
     DetailCommentInfo,
-    GoodList
+    GoodList,
+    DetailBottomBar
   },
   created() {
     // 1.获取iid
@@ -73,6 +78,15 @@ export default {
       if (data.rate.cRate !== 0) {
         this.commentInfo = data.rate.list[0]
       }
+
+      // this.$nextTick(() => {
+      //   this.themeTopYs = []
+      //   this.themeTopYs.push(0)
+      //   this.themeTopYs.push(this.$refs.params.$el.offsetTop)
+      //   this.themeTopYs.push(this.$refs.comment.$el.offsetTop)
+      //   this.themeTopYs.push(this.$refs.recommend.$el.offsetTop)
+      // })
+
     })
     // 3.请求推荐数据
     getRecommend().then(res => {
@@ -82,6 +96,25 @@ export default {
   methods: {
     detailGoodsImgLoad() {
       this.$refs.scroll.refresh()
+      this.themeTopYs = []
+      this.themeTopYs.push(0)
+      this.themeTopYs.push(this.$refs.params.$el.offsetTop-44)
+      this.themeTopYs.push(this.$refs.comment.$el.offsetTop-44)
+      this.themeTopYs.push(this.$refs.recommend.$el.offsetTop-44)
+    },
+    tabNavClick(index) {
+      this.$refs.scroll.scrollTo(0, -this.themeTopYs[index], 200)
+    },
+    scroll(position) {
+      if ( position.y <= -this.themeTopYs[3]) {
+        if(this.$refs.nav.currentIndex != 3) this.$refs.nav.currentIndex = 3
+      }else if (position.y <= -this.themeTopYs[2]) {
+        if(this.$refs.nav.currentIndex != 2) this.$refs.nav.currentIndex = 2
+      }else if (position.y <= -this.themeTopYs[1]) {
+        if(this.$refs.nav.currentIndex != 1) this.$refs.nav.currentIndex = 1
+      }else {
+        if(this.$refs.nav.currentIndex != 0) this.$refs.nav.currentIndex = 0
+      }
     }
   },
   mounted() {
@@ -89,7 +122,7 @@ export default {
     this.$bus.$on('detailItemImgLoad', () => {
       refresh()
     })
-  },
+  }
 }
 </script>
 
@@ -101,7 +134,7 @@ export default {
     background: #fff;
   }
   .content {
-    height: calc(100% - 44px);
+    height: calc(100% - 102px);
     overflow: hidden;
   }
 </style>
