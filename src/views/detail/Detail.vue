@@ -10,7 +10,8 @@
       <detail-comment-info ref="comment" :comment-info="commentInfo" />
       <good-list ref="recommend" :goods="recommends" />
     </scroll>
-    <detail-bottom-bar />
+    <back-top v-show="isShowBackTop" @click.native="backClick" />
+    <detail-bottom-bar @addToCart="addToCart" />
   </div>
 </template>
 
@@ -25,6 +26,7 @@ import DetailParamInfo from './childComps/DetailParamInfo'
 import DetailCommentInfo from './childComps/DetailCommentInfo'
 import GoodList from 'components/content/goods/GoodList'
 import DetailBottomBar from './childComps/DetailBottomBar'
+import BackTop from 'components/content/backTop/BackTop'
 
 
 import {getDetail, GoodsDetail, Shop, GoodsParam, getRecommend} from 'network/detail'
@@ -42,7 +44,8 @@ export default {
       paramInfo: {},
       commentInfo: {},
       recommends: [],
-      themeTopYs: []
+      themeTopYs: [],
+      isShowBackTop: false
     }
   },
   components: {
@@ -55,7 +58,8 @@ export default {
     DetailParamInfo,
     DetailCommentInfo,
     GoodList,
-    DetailBottomBar
+    DetailBottomBar,
+    BackTop
   },
   created() {
     // 1.获取iid
@@ -106,6 +110,7 @@ export default {
       this.$refs.scroll.scrollTo(0, -this.themeTopYs[index], 200)
     },
     scroll(position) {
+      this.isShowBackTop = (-position.y) > 1000
       if ( position.y <= -this.themeTopYs[3]) {
         if(this.$refs.nav.currentIndex != 3) this.$refs.nav.currentIndex = 3
       }else if (position.y <= -this.themeTopYs[2]) {
@@ -115,6 +120,25 @@ export default {
       }else {
         if(this.$refs.nav.currentIndex != 0) this.$refs.nav.currentIndex = 0
       }
+    },
+    //监听返回顶部
+    backClick() {
+      this.$refs.scroll.scrollTo(0, 0, 500)
+    },
+    // 添加到购物车
+    addToCart() {
+      // 1.获取购物车需要展示的信息
+      const product = {}
+      product.images = this.topImages[0]
+      product.title = this.goodsInfo.title
+      product.desc = this.goodsInfo.desc
+      product.price = this.goodsInfo.nowLowPrice
+      product.iid = this.iid
+      // 2.将商品添加到购物车
+      //直接使用mutations修改数据：劣势：这里有两种操作分支，这样不能跟踪是具体哪一步操作
+      //this.$store.commit('addCart', product)
+      // 使用actions过渡，分流这两部操作，方便跟踪具体操作
+      this.$store.dispatch('addCart', product)
     }
   },
   mounted() {
