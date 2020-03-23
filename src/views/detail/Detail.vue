@@ -32,6 +32,8 @@ import BackTop from 'components/content/backTop/BackTop'
 import {getDetail, GoodsDetail, Shop, GoodsParam, getRecommend} from 'network/detail'
 import {debounce} from 'common/utils'
 
+import {mapActions} from 'vuex'
+
 export default {
   name: 'Detail',
   data() {
@@ -98,6 +100,7 @@ export default {
     })
   },
   methods: {
+    ...mapActions(['addCart']),
     detailGoodsImgLoad() {
       this.$refs.scroll.refresh()
       this.themeTopYs = []
@@ -132,13 +135,18 @@ export default {
       product.images = this.topImages[0]
       product.title = this.goodsInfo.title
       product.desc = this.goodsInfo.desc
-      product.price = this.goodsInfo.nowLowPrice
+      product.price = this.goodsInfo.nowPrice
       product.iid = this.iid
       // 2.将商品添加到购物车
       //直接使用mutations修改数据：劣势：这里有两种操作分支，这样不能跟踪是具体哪一步操作
       //this.$store.commit('addCart', product)
-      // 使用actions过渡，分流这两部操作，方便跟踪具体操作
-      this.$store.dispatch('addCart', product)
+      // 使用actions过渡，分流这两步操作，方便跟踪具体操作
+      this.addCart(product).then(res => {
+        this.$toast.show(res)
+      })
+      // this.$store.dispatch('addCart', product).then(res => {
+      //   console.log(res)
+      // })
     }
   },
   mounted() {
