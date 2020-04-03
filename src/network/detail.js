@@ -20,7 +20,7 @@ export class GoodsDetail {
     this.columns = columns;
     this.services = services;
     this.nowLowPrice = '￥' + itemInfo.lowNowPrice;
-    this.nowHighPrice = '￥' + itemInfo.highNowPrice;
+    this.nowPrice = itemInfo.lowNowPrice;
   }
 }
 //店铺得信息抽离
