@@ -1,4 +1,4 @@
-//baseURL属于保密接口，请添加微信coderwhy
+//baseURL属于保密接口，请联系我
 import baseURL from 'yyyy'
 import axios from 'axios'
 
